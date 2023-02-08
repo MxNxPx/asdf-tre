@@ -48,7 +48,7 @@ getArch() {
 
 getPlatform() {
   PLATFORM="$(uname | tr '[:upper:]' '[:lower:]')"
-  case $OS in
+  case $PLATFORM in
   linux*) PLATFORM="linux" ;;
   darwin) PLATFORM="apple-darwin" ;;
   esac
