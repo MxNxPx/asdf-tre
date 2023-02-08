@@ -9,3 +9,5 @@ plugin_dir=$(dirname "$(dirname "$current_script_path")")
 source "${plugin_dir}/lib/utils.bash"
 
 list_all_versions | sort_versions | xargs echo
+# only display versions 0.3.1 and above (release when assets were standardized with arch-os-ubi pattern)
+list_all_versions | sort_versions | xargs echo | sed 's/.* \(0.3.1 .*\)$/\1/'
