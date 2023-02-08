@@ -2,7 +2,6 @@
 
 set -euo pipefail
 
-# TODO: Ensure this is the correct GitHub homepage where releases can be downloaded for tre.
 GH_REPO="https://github.com/dduan/tre"
 TOOL_NAME="tre"
 TOOL_TEST="tre --help"
@@ -31,9 +30,36 @@ list_github_tags() {
 }
 
 list_all_versions() {
-  # TODO: Adapt this. By default we simply list the tag names from GitHub releases.
-  # Change this function if tre has other means of determining installable versions.
   list_github_tags
+}
+
+getArch() {
+  ARCH=$(uname -m)
+  case $ARCH in
+  armv*) ARCH="arm" ;;
+  aarch64) ARCH="aarch64" ;;
+  x86) ARCH="386" ;;
+  x86_64) ARCH="x86_64" ;;
+  i686) ARCH="386" ;;
+  i386) ARCH="386" ;;
+  esac
+  echo "$ARCH"
+}
+
+getPlatform() {
+  PLATFORM="$(uname | tr '[:upper:]' '[:lower:]')"
+  case $OS in
+  linux*) PLATFORM="linux" ;;
+  darwin) PLATFORM="apple-darwin";;
+  esac
+  if [ "${PLATFORM}" == "linux" ]; then
+     ARCH=$(uname -m)
+     case $ARCH in
+       armv*) PLATFORM="unknown-linux-gnueabihf" ;;
+       *) PLATFORM="unknown-linux-musl" ;;
+     esac
+  fi
+  echo "$PLATFORM"
 }
 
 download_release() {
@@ -41,8 +67,9 @@ download_release() {
   version="$1"
   filename="$2"
 
-  # TODO: Adapt the release URL convention for tre
-  url="$GH_REPO/archive/v${version}.tar.gz"
+  platform="$(getPlatform)"
+  arch="$(getArch)"
+  url="$GH_REPO/releases/download/v${version}/${TOOL_NAME}-v${version}-${arch}-${platform}.tar.gz"
 
   echo "* Downloading $TOOL_NAME release $version..."
   curl "${curl_opts[@]}" -o "$filename" -C - "$url" || fail "Could not download $url"
@@ -61,8 +88,6 @@ install_version() {
     mkdir -p "$install_path"
     cp -r "$ASDF_DOWNLOAD_PATH"/* "$install_path"
 
-    # TODO: Assert tre executable exists.
-    local tool_cmd
     tool_cmd="$(echo "$TOOL_TEST" | cut -d' ' -f1)"
     test -x "$install_path/$tool_cmd" || fail "Expected $install_path/$tool_cmd to be executable."
 
