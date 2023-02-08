@@ -50,14 +50,14 @@ getPlatform() {
   PLATFORM="$(uname | tr '[:upper:]' '[:lower:]')"
   case $OS in
   linux*) PLATFORM="linux" ;;
-  darwin) PLATFORM="apple-darwin";;
+  darwin) PLATFORM="apple-darwin" ;;
   esac
   if [ "${PLATFORM}" == "linux" ]; then
-     ARCH=$(uname -m)
-     case $ARCH in
-       armv*) PLATFORM="unknown-linux-gnueabihf" ;;
-       *) PLATFORM="unknown-linux-musl" ;;
-     esac
+    ARCH=$(uname -m)
+    case $ARCH in
+    armv*) PLATFORM="unknown-linux-gnueabihf" ;;
+    *) PLATFORM="unknown-linux-musl" ;;
+    esac
   fi
   echo "$PLATFORM"
 }
